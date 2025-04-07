@@ -1,0 +1,209 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ question.title }}{% endblock %}
+
+{% block content %}
+    <div class="question-detail">
+        <div class="question-header">
+            <div class="user-avatar">
+                {{ question.user.username.0|upper }}
+            </div>
+            <div class="user-info">
+                <span class="user-name">{{ question.user.username }}</span> · 
+                <span class="post-date">{{ question.created_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+        
+        <h1 class="question-title">{{ question.title }}</h1>
+    </div>
+    
+    <div class="answer-section">
+        <div class="section-header">
+            <h2 class="section-title">{{ answers.count }} Answer{{ answers.count|pluralize }}</h2>
+        </div>
+        
+        <div class="answer-list">
+            {% for answer in answers %}
+                <div class="answer">
+                    <div class="answer-meta">
+                        <div class="user-avatar">
+                            {{ answer.user.username.0|upper }}
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">{{ answer.user.username }}</span> · 
+                            <span class="post-date">{{ answer.created_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="answer-text">
+                        {{ answer.text }}
+                    </div>
+                    
+                    <div class="answer-actions">
+                        <div class="like-count">
+                            <i class="far fa-thumbs-up"></i> {{ answer.like_set.count }}
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'like_answer' answer.id %}" class="like-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-link">
+                                    <i class="far fa-thumbs-up"></i> Like
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-answers">
+                    <div class="empty-icon">
+                        <i class="far fa-comment-alt"></i>
+                    </div>
+                    <p>No answers yet. Be the first to answer!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="post-answer-section">
+        {% if user.is_authenticated %}
+            <div class="section-header">
+                <h2 class="section-title">Your Answer</h2>
+            </div>
+            
+            <form method="post" class="answer-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.text.label_tag }}
+                    {{ form.text }}
+                    {% if form.text.errors %}
+                        <div class="form-error">{{ form.text.errors }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">Post Answer</button>
+            </form>
+        {% else %}
+            <div class="login-prompt">
+                <p><a href="{% url 'login' %}">Login</a> or <a href="{% url 'signup' %}">Sign up</a> to post an answer</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <style>
+        .question-detail {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .question-title {
+            font-size: 24px;
+            margin: 10px 0 0;
+            font-weight: 600;
+        }
+        
+        .answer-section {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+            color: #636466;
+        }
+        
+        .answer-list {
+            /* Styles for answer list are in base template */
+        }
+        
+        .answer {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .answer:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-actions {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #636466;
+        }
+        
+        .like-count {
+            margin-right: 15px;
+        }
+        
+        .like-form {
+            display: inline;
+        }
+        
+        .btn-link {
+            background: none;
+            border: none;
+            color: #636466;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .btn-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn-link i {
+            margin-right: 5px;
+        }
+        
+        .empty-answers {
+            padding: 40px 20px;
+            text-align: center;
+            color: #636466;
+        }
+        
+        .empty-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: var(--border-color);
+        }
+        
+        .post-answer-section {
+            padding-bottom: 20px;
+        }
+        
+        .answer-form {
+            padding: 20px;
+        }
+        
+        .login-prompt {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .login-prompt a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-prompt a:hover {
+            text-decoration: underline;
+        }
+        
+        .form-error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+{% endblock %}

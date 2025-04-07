@@ -1,0 +1,101 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Home - All Questions{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1 class="page-title">All Questions</h1>
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'post_question' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Ask a Question
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="questions-list">
+        {% for question in questions %}
+            <div class="question-item">
+                <div class="question-header">
+                    <div class="user-avatar">
+                        {{ question.user.username.0|upper }}
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ question.user.username }}</span> · 
+                        <span class="post-date">{{ question.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                
+                <h3 class="question-title">
+                    <a href="{% url 'question_detail' question.id %}">
+                        {{ question.title }}
+                    </a>
+                </h3>
+                
+                <div class="question-footer">
+                    <a href="{% url 'question_detail' question.id %}" class="action-link">
+                        <i class="far fa-comment"></i> {{ question.answer_set.count }} Answer{{ question.answer_set.count|pluralize }}
+                    </a>
+                    <a href="{% url 'question_detail' question.id %}" class="action-link">
+                        <i class="far fa-eye"></i> View
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="far fa-question-circle"></i>
+                </div>
+                <h3>No questions yet</h3>
+                <p>Be the first to ask a question!</p>
+                
+                {% if user.is_authenticated %}
+                    <a href="{% url 'post_question' %}" class="btn btn-primary">Ask a Question</a>
+                {% else %}
+                    <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up to Ask</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .page-title {
+            font-size: 22px;
+            margin: 0;
+            color: var(--text-color);
+        }
+        
+        .questions-list {
+            /* Styling already included in base template */
+        }
+        
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            color: var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #636466;
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
